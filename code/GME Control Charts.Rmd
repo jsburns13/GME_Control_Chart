@@ -25,7 +25,8 @@ vtable::vtable(df)
 df <- df %>%
   arrange(datadate) %>%
   mutate(prccd_delta = (prccd/lag(prccd)-1)*100) %>%
-  mutate(week = floor_date(datadate, "weeks", week_start=1))
+  mutate(week = floor_date(datadate, "weeks", week_start=1)) %>%
+  mutate(month = floor_date(datadate, "months"))
   
 
 ggplot(data=df, aes(x=datadate,y=prccd_delta)) +
@@ -46,10 +47,16 @@ d_4 <- 2.114
 df <- df %>%
   mutate(xbar = rollmeanr(prccd_delta,k=5,fill=NA))
 
+df_2022 <- df %>%
+  filter(datadate >= ISOdate(2022,1,1) & datadate <= ISOdate(2022,12,31))
+
+df_2021 <- df %>%
+  filter(datadate >= ISOdate(2021,1,1) & datadate <= ISOdate(2021,12,31))
+
 qic(
   y=prccd_delta,
     x=week,
-    data=df,
+    data=df_2021,
     chart='xbar',
     main='Percent Change (Xbar chart)',
     ylab='Percent Change',
@@ -59,11 +66,21 @@ qic(
 qic(
   y=prccd_delta,
   x=week,
-  data=df,
+  data=df_2021,
   chart='s',
   main='Standard deviation of percent change (S chart)',
   ylab='Percent change',
   xlab='Date'
 )
+
+qic(
+  y=prccd_delta,
+    x=month,
+    data=df,
+    chart='xbar',
+    main='Percent Change (Xbar chart)',
+    ylab='Percent Change',
+    xlab='Date'
+    )
 ```
 
